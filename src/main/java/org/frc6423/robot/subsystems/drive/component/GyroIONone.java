@@ -1,0 +1,23 @@
+// Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
+// https://github.com/wmironpatriots
+// 
+// Open Source Software; you can modify and/or share it under the terms of
+// MIT license file in the root directory of this project
+
+package org.frc6423.robot.subsystems.drive.component;
+
+import org.wpilib.math.geometry.Rotation2d;
+
+/** {@link GyroIO} extension for no gyro hardware */
+public class GyroIONone extends GyroIO {
+  @Override
+  public void periodic() {}
+
+  @Override
+  public void reset(Rotation2d angle) {}
+
+  @Override
+  public Rotation2d getYawRotation2d() {
+    return Rotation2d.ZERO;
+  }
+}
