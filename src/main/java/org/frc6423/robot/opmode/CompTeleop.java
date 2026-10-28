@@ -5,7 +5,6 @@
 package org.frc6423.robot.opmode;
 
 import org.wpilib.command3.Trigger;
-import org.wpilib.command3.button.CommandNiDsPS5Controller;
 import org.wpilib.command3.button.CommandNiDsXboxController;
 import org.wpilib.command3.button.RobotModeTriggers;
 
@@ -24,7 +23,7 @@ import org.frc6423.robot.subsystems.drive.DriveSubsystem;
 public class CompTeleop extends PeriodicOpMode {
   private final Robot robot;
   private final DriveSubsystem mDrive;
-  private final CommandNiDsPS5Controller mDriverController = new CommandNiDsPS5Controller(0);
+  private final CommandNiDsXboxController mDriverController = new CommandNiDsXboxController(0);
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public CompTeleop(Robot robot) {

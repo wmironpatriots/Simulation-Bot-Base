@@ -5,23 +5,25 @@
 package org.frc6423.robot.opmode;
 
 import org.wpilib.command3.Scheduler;
+import edu.wpi.first.wpilibj2.command.Command;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.frc6423.robot.Robot;
 import org.frc6423.robot.subsystems.drive.DriveSubsystem;
-import org.wpilib.command3.Command;
 
 @Autonomous(name = "My Auto", group = "Group 1")
 public class MyAuto extends PeriodicOpMode {
   private final Robot robot;
   private final DriveSubsystem mDrive;
   private final Command autoCommand;
+  private final org.wpilib.command.CommandScheduler commands;
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public MyAuto(Robot robot) {
     this.robot = robot;
-    this.mDrive = robot.getDriveSubsystem();
-    this.autoCommand = null; 
+    this.commands = new org.wpilib.command.CommandScheduler();
+    this.autoCommand = edu.wpi.first.wpilibj2.command.Commands.run(() -> mDrive.drive(0.5, 0), mDrive);
+    this.autoCommand = commands.run(() -> robot.getDriveSubsystem().stop(), robot.getDriveSubsystem());
   }
 
   /*
@@ -38,7 +40,7 @@ public class MyAuto extends PeriodicOpMode {
   @Override
   public void start() {
     // This method is called once when the opmode is started.
-    Scheduler.getDefault().schedule(autoCommand);
+    autoCommand.schedule();
   }
 
   @Override
