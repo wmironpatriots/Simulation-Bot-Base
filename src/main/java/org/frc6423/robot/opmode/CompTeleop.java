@@ -90,8 +90,25 @@ public class CompTeleop extends PeriodicOpMode {
                 () ->
                     NodeSelector.selectClosestNode(
                         Constants.Field.kReefScoringPoses, mDrive.getPose2d(), 0.8)));
+
+    
+    Trigger crossPressed = mDriverController.cross();
+    Trigger squarePressed = mDriverController.square();
+    Trigger trianglePressed = mDriverController.triangle();
+    Trigger circlePressed = mDriverController.circle();
+    Trigger l1Pressed = mDriverController.L1();
     Trigger l2Pressed = mDriverController.L2();
-    RobotModeTriggers.teleop().and(l2Pressed).whileTrue(mSuperstructure.setPoseReady());
+    Trigger r1Pressed = mDriverController.R1();
+    Trigger r2Pressed = mDriverController.R2();
+    RobotModeTriggers.teleop().and(crossPressed).onTrue(mSuperstructure.setPoseReady());
+    RobotModeTriggers.teleop().and(squarePressed).onTrue(mSuperstructure.setPoseScoreL2());
+    RobotModeTriggers.teleop().and(trianglePressed).onTrue(mSuperstructure.setPoseScoreL3());
+    RobotModeTriggers.teleop().and(circlePressed).onTrue(mSuperstructure.setPoseScoreL4());
+    RobotModeTriggers.teleop().and(l2Pressed).onTrue(mSuperstructure.setPoseHandoff());
+    RobotModeTriggers.teleop().and(r1Pressed).onTrue(mSuperstructure.intake());
+    RobotModeTriggers.teleop().and(l1Pressed).onTrue(mSuperstructure.stowIntake());
+  
+
   }
 
   @Override

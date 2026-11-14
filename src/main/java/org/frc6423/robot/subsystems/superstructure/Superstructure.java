@@ -46,9 +46,43 @@ public class Superstructure implements Mechanism {
 
     public Command setPoseReady() {
         return run(coroutine -> {
+            mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
             mArm.setAngleSetpoint(ArmIO.POSE_READY);
+            mElevator.setHeightSetpoint(ElevatorIO.POSE_READY);
         }).named("Set Superstructure to Ready Pose");
     }
+
+    public Command setPoseHandoff() {
+        return run(coroutine -> {
+            mIntake.setAngleSetpoint(IntakeIO.POSE_HANDOFF);
+            mArm.setAngleSetpoint(ArmIO.POSE_HANDOFF);
+            mElevator.setHeightSetpoint(ElevatorIO.POSE_HANDOFF);
+        }).named("Set Superstructure to Handoff Pose");
+    }
+    public Command setPoseScoreL2() {
+        return run(coroutine -> {
+            mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
+            mArm.setAngleSetpoint(ArmIO.POSE_SCORE_L2);
+            mElevator.setHeightSetpoint(ElevatorIO.POSE_SCORE_L2);
+        }).named("Set Superstructure to Score L2 Pose");
+    }
+
+    public Command setPoseScoreL3() {
+        return run(coroutine -> {
+            mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
+            mArm.setAngleSetpoint(ArmIO.POSE_SCORE_L3);
+            mElevator.setHeightSetpoint(ElevatorIO.POSE_SCORE_L3);
+        }).named("Set Superstructure to Score L3 Pose");
+    }
+
+    public Command setPoseScoreL4() {
+        return run(coroutine -> {
+            mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
+            mArm.setAngleSetpoint(ArmIO.POSE_SCORE_L4);
+            mElevator.setHeightSetpoint(ElevatorIO.POSE_SCORE_L4);
+        }).named("Set Superstructure to Score L4 Pose");
+    }
+
 
     public Command setIntakePosition(double angleDegrees) {
         return run(coroutine -> {
