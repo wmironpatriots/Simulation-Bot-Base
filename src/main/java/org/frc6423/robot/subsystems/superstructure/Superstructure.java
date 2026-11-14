@@ -93,4 +93,35 @@ public class Superstructure implements Mechanism {
     public Command elevatorScoreL4() {
         return setElevatorPosition(ElevatorIO.POSE_SCORE_L4);
     }
+    private Command setArmPosition(double angleDegrees) {
+    return run(coroutine -> {
+        mArm.setAngleSetpoint(angleDegrees);
+    }).named("Set Arm Position");
+}
+    public Command armHandoff() {
+        return setArmPosition(ArmIO.POSE_HANDOFF);
+    }
+    public Command armReady() {
+        return setArmPosition(ArmIO.POSE_READY);
+    }
+    public Command armScoreL2() {
+        return setArmPosition(ArmIO.POSE_SCORE_L2);
+    }
+
+    public Command armScoreL3() {
+        return setArmPosition(ArmIO.POSE_SCORE_L3);
+    }
+
+    public Command armScoreL4() {
+        return setArmPosition(ArmIO.POSE_SCORE_L4);
+    }
+    public Command armAfterL2() {
+        return setArmPosition(ArmIO.POSE_AFTER_L2);
+    }
+    public Command armAfterL3() {
+        return setArmPosition(ArmIO.POSE_AFTER_L3);
+    }
+    public Command armAfterL4() {
+        return setArmPosition(ArmIO.POSE_AFTER_L4);
+    }
 }
