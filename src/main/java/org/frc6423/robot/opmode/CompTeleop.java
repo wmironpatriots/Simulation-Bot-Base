@@ -4,12 +4,11 @@
 
 package org.frc6423.robot.opmode;
 
+import org.frc6423.robot.superstructure.Superstructure;
 import org.wpilib.command3.Trigger;
 import org.wpilib.command3.button.CommandNiDsXboxController;
 import org.wpilib.command3.button.RobotModeTriggers;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.frc6423.lib.util.InputStream;
@@ -23,13 +22,16 @@ import org.frc6423.robot.subsystems.drive.DriveSubsystem;
 public class CompTeleop extends PeriodicOpMode {
   private final Robot robot;
   private final DriveSubsystem mDrive;
+  private final Superstructure mSuperstructure;
   private final CommandNiDsXboxController mDriverController = new CommandNiDsXboxController(0);
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public CompTeleop(Robot robot) {
     this.robot = robot;
     this.mDrive = robot.getDriveSubsystem();
+    this.mSuperstructure = robot.getSuperstructure();
     configureDriverBindings();
+    
   }
 
   private void configureDriverBindings() {
@@ -87,7 +89,14 @@ public class CompTeleop extends PeriodicOpMode {
                 () ->
                     NodeSelector.selectClosestNode(
                         Constants.Field.kReefScoringPoses, mDrive.getPose2d(), 0.8)));
+// ~~~ Mechanism Controls ~~~
 
+mDriverController.a().onTrue(mSuperstructure.handoff());
+mDriverController.b().onTrue(mSuperstructure.ready());
+mDriverController.x().onTrue(mSuperstructure.scoreL2());
+mDriverController.y().onTrue(mSuperstructure.scoreL3());
+mDriverController.leftBumper().onTrue(mSuperstructure.scoreL4());
+mDriverController.rightBumper().whileTrue(mSuperstructure.intake());
   }
 
   @Override
