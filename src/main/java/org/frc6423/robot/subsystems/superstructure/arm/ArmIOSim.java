@@ -1,6 +1,5 @@
 package org.frc6423.robot.subsystems.superstructure.arm;
 import org.wpilib.simulation.SingleJointedArmSim;
-import org.wpilib.driverstation.RobotState;
 
 public class ArmIOSim extends ArmIO {
     private static final double kPeriodSeconds = 0.02;
@@ -15,25 +14,21 @@ public class ArmIOSim extends ArmIO {
                     Math.toRadians(kArmMinAngleDegrees),
                     Math.toRadians(kArmMaxAngleDegrees),
                     true,
-                    Math.toRadians(POSE_READY)
+                    Math.toRadians(90.0)
             );
 
     private final org.wpilib.math.controller.PIDController mPIDController = new org.wpilib.math.controller.PIDController(20.0, 0.0, 0.0);
     private final org.wpilib.math.controller.ArmFeedforward mFeedforward = new org.wpilib.math.controller.ArmFeedforward(0.0, 0.29, 0.0, 0.0);
 
-    private double mAngleSetpointRadians = Math.toRadians(POSE_READY);
+    private double mAngleSetpointRadians = Math.toRadians(90.0);
     private double mAppliedVoltage = 0.0;
 
     @Override
     public void periodic() {
-        if (RobotState.isEnabled()) {
-            double pidOutput = mPIDController.calculate(mArmSim.getAngle(), mAngleSetpointRadians);
-            double feedforwardOutput = mFeedforward.calculate(mArmSim.getAngle(), 0.0);
-            mAppliedVoltage = Math.clamp(pidOutput + feedforwardOutput, -kMaxVoltage, kMaxVoltage);
-        } else {
-            mPIDController.reset();
-            mAppliedVoltage = 0.0;
-        }
+        double pidOutput = mPIDController.calculate(mArmSim.getAngle(), mAngleSetpointRadians);
+        double feedforwardOutput = mFeedforward.calculate(mArmSim.getAngle(), mArmSim.getVelocity());
+        
+        mAppliedVoltage = Math.clamp(pidOutput + feedforwardOutput, -kMaxVoltage, kMaxVoltage);
         
         mArmSim.setInputVoltage(mAppliedVoltage);
         mArmSim.update(kPeriodSeconds);
@@ -75,12 +70,10 @@ public class ArmIOSim extends ArmIO {
         mArmSim.setInputVoltage(0.0);
         mAngleSetpointRadians = 0.0;
         mAppliedVoltage = 0.0;
-        mPIDController.reset();
     }
 
     @Override
     public void stop() {
-        mPIDController.reset();
         mAppliedVoltage = 0.0;
         mArmSim.setInputVoltage(0.0);
     }
