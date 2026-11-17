@@ -4,8 +4,8 @@
 
 package org.frc6423.robot.opmode;
 
+import org.frc6423.robot.superstructure.Superstructure;
 import org.wpilib.command3.Trigger;
-import org.wpilib.command3.button.CommandNiDsPS5Controller;
 import org.wpilib.command3.button.CommandNiDsXboxController;
 import org.wpilib.command3.button.RobotModeTriggers;
 
@@ -19,6 +19,7 @@ import org.frc6423.robot.Constants;
 import org.frc6423.robot.Constants.Flags;
 import org.frc6423.robot.Robot;
 import org.frc6423.robot.subsystems.drive.DriveSubsystem;
+import org.frc6423.robot.subsystems.superstructure.Superstructure;
 
 @Teleop
 public class CompTeleop extends PeriodicOpMode {
@@ -30,7 +31,9 @@ public class CompTeleop extends PeriodicOpMode {
   public CompTeleop(Robot robot) {
     this.robot = robot;
     this.mDrive = robot.getDriveSubsystem();
+    this.mSuperstructure = robot.getSuperstructure();
     configureDriverBindings();
+    
   }
 
   private void configureDriverBindings() {
