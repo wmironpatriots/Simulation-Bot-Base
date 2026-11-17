@@ -1,13 +1,12 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package org.frc6423.robot.opmode;
 
 import org.wpilib.command3.Scheduler;
-import edu.wpi.first.wpilibj2.command.Command;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.PeriodicOpMode;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+
 import org.frc6423.robot.Robot;
 import org.frc6423.robot.subsystems.drive.DriveSubsystem;
 
@@ -16,14 +15,12 @@ public class MyAuto extends PeriodicOpMode {
   private final Robot robot;
   private final DriveSubsystem mDrive;
   private final Command autoCommand;
-  private final org.wpilib.command.CommandScheduler commands;
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public MyAuto(Robot robot) {
     this.robot = robot;
-    this.commands = new org.wpilib.command.CommandScheduler();
-    this.autoCommand = edu.wpi.first.wpilibj2.command.Commands.run(() -> mDrive.drive(0.5, 0), mDrive);
-    this.autoCommand = commands.run(() -> robot.getDriveSubsystem().stop(), robot.getDriveSubsystem());
+    this.mDrive = robot.getDriveSubsystem();
+    this.autoCommand = null; 
   }
 
   /*
@@ -40,11 +37,16 @@ public class MyAuto extends PeriodicOpMode {
   @Override
   public void start() {
     // This method is called once when the opmode is started.
-    autoCommand.schedule();
+    Scheduler.getDefault().schedule(autoCommand);
   }
 
-  @Override
-  public void end() {
-    // This method is called once when the opmode ends.
-  }
+    @Override
+    public void end() {
+        // Cancel all autonomous movements.
+        for (Command command : autoCommands) {
+            Scheduler.getDefault().cancel(command);
+        }
+
+        mDrive.stop();
+    }
 }
