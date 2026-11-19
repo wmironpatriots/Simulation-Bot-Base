@@ -5,8 +5,11 @@
 package org.frc6423.robot.opmode;
 
 import org.wpilib.command3.Scheduler;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.PeriodicOpMode;
+import org.frc6423.robot.Constants;
 import org.frc6423.robot.Robot;
 import org.frc6423.robot.subsystems.drive.DriveSubsystem;
 import org.wpilib.command3.Command;
@@ -21,7 +24,21 @@ public class MyAuto extends PeriodicOpMode {
   public MyAuto(Robot robot) {
     this.robot = robot;
     this.mDrive = robot.getDriveSubsystem();
-    this.autoCommand = null; 
+    mDrive.reset(Constants.Field.kBlueAllianceHubPose2d);
+
+    this.autoCommand =
+        mDrive
+            .driveSetTranslationalAndAngularSetpoint(
+                new Pose2d(
+                    Constants.Field.kBlueAllianceHubPose2d.getX() - 2, // X destination
+                    Constants.Field.kBlueAllianceHubPose2d.getY(), // Y destination
+                    new Rotation2d(Math.toRadians(90))))
+            .andThen(
+                mDrive.driveTeleoperated(
+                    () -> 1, // final X
+                    () -> 0.0, // final Y
+                    () -> 0.0)) // final heading
+            .named("My Auto Command");
   }
 
   /*
@@ -31,9 +48,7 @@ public class MyAuto extends PeriodicOpMode {
    * which can have periods that differ from the main Robot instance.
    */
   @Override
-  public void periodic() {
-    
-  }
+  public void periodic() {}
 
   @Override
   public void start() {

@@ -26,6 +26,16 @@ public class CompTeleop extends PeriodicOpMode {
   private final DriveSubsystem mDrive;
   private final CommandNiDsPS5Controller mDriverController = new CommandNiDsPS5Controller(0);
 
+  public static final double kIntakeMinAngleDegrees = -45.0;
+  public static final double kIntakeMaxAngleDegrees = 270.0;
+  public static final double kIntakeLengthMeters = 0.5;
+  public static final double kIntakeMassKg = 5.0;
+  public static final double kIntakeGearRatio = 20.0;
+
+  public static final double POSE_HANDOFF = 140.0;
+  public static final double POSE_STOW = 0.0;
+  public static final double POSE_INTAKE = 0.0;
+
   /** The Robot instance is passed into the opmode via the constructor. */
   public CompTeleop(Robot robot) {
     this.robot = robot;
