@@ -4,8 +4,8 @@
 
 package org.frc6423.robot.opmode;
 
+import org.frc6423.robot.superstructure.Superstructure;
 import org.wpilib.command3.Trigger;
-import org.wpilib.command3.button.CommandNiDsPS5Controller;
 import org.wpilib.command3.button.CommandNiDsXboxController;
 import org.wpilib.command3.button.RobotModeTriggers;
 
@@ -19,18 +19,23 @@ import org.frc6423.robot.Constants;
 import org.frc6423.robot.Constants.Flags;
 import org.frc6423.robot.Robot;
 import org.frc6423.robot.subsystems.drive.DriveSubsystem;
+import org.frc6423.robot.subsystems.superstructure.Superstructure;
 
 @Teleop
 public class CompTeleop extends PeriodicOpMode {
   private final Robot robot;
   private final DriveSubsystem mDrive;
-  private final CommandNiDsPS5Controller mDriverController = new CommandNiDsPS5Controller(0);
+  private final Superstructure mSuperstructure;
+  private final CommandNiDsXboxController mDriverController =
+    new CommandNiDsXboxController(0);
 
   /** The Robot instance is passed into the opmode via the constructor. */
   public CompTeleop(Robot robot) {
     this.robot = robot;
     this.mDrive = robot.getDriveSubsystem();
+    this.mSuperstructure = robot.getSuperstructure();
     configureDriverBindings();
+    
   }
 
   private void configureDriverBindings() {
@@ -88,7 +93,11 @@ public class CompTeleop extends PeriodicOpMode {
                 () ->
                     NodeSelector.selectClosestNode(
                         Constants.Field.kReefScoringPoses, mDrive.getPose2d(), 0.8)));
-
+mSuperstructure.configureStateTransitions(
+    mDriverController.a(),
+    mDriverController.y(),
+    mDriverController.b()
+);
   }
 
   @Override

@@ -6,6 +6,7 @@ package org.frc6423.robot;
 
 import org.frc6423.robot.Constants.Flags;
 import org.frc6423.robot.subsystems.drive.DriveSubsystem;
+import org.frc6423.robot.subsystems.superstructure.Superstructure;
 import org.wpilib.epilogue.Epilogue;
 import org.wpilib.epilogue.EpilogueConfiguration;
 import org.wpilib.epilogue.Logged;
@@ -30,8 +31,15 @@ public class Robot extends OpModeRobot {
   @Logged(name = "Drive Subsystem")
   private final DriveSubsystem mDrive = DriveSubsystem.create();
 
+  @Logged(name = "Superstructure")
+  private final Superstructure mSuperstructure = Superstructure.create();
+
   public DriveSubsystem getDriveSubsystem() {
     return mDrive;
+  }
+
+  public Superstructure getSuperstructure() {
+    return mSuperstructure;
   }
 
   /** Field-relative REEF scoring targets for the AdvantageScope field view. */
@@ -93,6 +101,7 @@ public class Robot extends OpModeRobot {
   public void robotPeriodic() {
     Scheduler.getDefault().run();
     mDrive.periodic();
+    mSuperstructure.periodic();
   }
   /**
    * This function is called periodically anytime when no opmode is selected, including when the
