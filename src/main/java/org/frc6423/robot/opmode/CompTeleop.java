@@ -4,6 +4,7 @@
 
 package org.frc6423.robot.opmode;
 
+import org.wpilib.command3.StateMachine;
 import org.wpilib.command3.Trigger;
 import org.wpilib.command3.button.CommandNiDsPS5Controller;
 import org.wpilib.command3.button.CommandNiDsXboxController;
@@ -25,6 +26,8 @@ public class CompTeleop extends PeriodicOpMode {
   private final Robot robot;
   private final DriveSubsystem mDrive;
   private final Superstructure mSuperstructure;
+  private StateMachine mSuperstructureStateMachine;
+
   private final CommandNiDsPS5Controller mDriverController = new CommandNiDsPS5Controller(0);
 
   /** The Robot instance is passed into the opmode via the constructor. */
@@ -33,6 +36,11 @@ public class CompTeleop extends PeriodicOpMode {
     this.mDrive = robot.getDriveSubsystem();
     this.mSuperstructure = robot.getSuperstructure();
     configureDriverBindings();
+    this.mSuperstructureStateMachine = mSuperstructure.createStateMachine(
+      mDriverController.cross(),
+      mDriverController.square(),
+      mDriverController.circle()
+    );
   }
 
   private void configureDriverBindings() {
@@ -90,25 +98,6 @@ public class CompTeleop extends PeriodicOpMode {
                 () ->
                     NodeSelector.selectClosestNode(
                         Constants.Field.kReefScoringPoses, mDrive.getPose2d(), 0.8)));
-
-    
-    Trigger crossPressed = mDriverController.cross();
-    Trigger squarePressed = mDriverController.square();
-    Trigger trianglePressed = mDriverController.triangle();
-    Trigger circlePressed = mDriverController.circle();
-    Trigger l1Pressed = mDriverController.L1();
-    Trigger l2Pressed = mDriverController.L2();
-    Trigger r1Pressed = mDriverController.R1();
-    Trigger r2Pressed = mDriverController.R2();
-    RobotModeTriggers.teleop().and(crossPressed).onTrue(mSuperstructure.setPoseReady());
-    RobotModeTriggers.teleop().and(squarePressed).onTrue(mSuperstructure.setPoseScoreL2());
-    RobotModeTriggers.teleop().and(trianglePressed).onTrue(mSuperstructure.setPoseScoreL3());
-    RobotModeTriggers.teleop().and(circlePressed).onTrue(mSuperstructure.setPoseScoreL4());
-    RobotModeTriggers.teleop().and(l2Pressed).onTrue(mSuperstructure.setPoseHandoff());
-    RobotModeTriggers.teleop().and(r1Pressed).onTrue(mSuperstructure.intake());
-    RobotModeTriggers.teleop().and(l1Pressed).onTrue(mSuperstructure.stowIntake());
-  
-
   }
 
   @Override
@@ -119,6 +108,9 @@ public class CompTeleop extends PeriodicOpMode {
   @Override
   public void start() {
     /* Called once when the robot is enabled. */
+    if (mSuperstructureStateMachine != null) {
+      org.wpilib.command3.Scheduler.getDefault().schedule(mSuperstructureStateMachine);
+    }
   }
 
   @Override
@@ -129,6 +121,9 @@ public class CompTeleop extends PeriodicOpMode {
   @Override
   public void end() {
     /* Called when the robot is disabled (after previously being enabled). */
+     if (mSuperstructureStateMachine != null) {
+        org.wpilib.command3.Scheduler.getDefault().cancel(mSuperstructureStateMachine);
+    }
   }
 
   @Override

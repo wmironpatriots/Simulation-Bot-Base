@@ -13,6 +13,9 @@ import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
 import org.wpilib.epilogue.Logged;
 
+import org.wpilib.command3.StateMachine;
+import java.util.function.BooleanSupplier;
+
 public class Superstructure implements Mechanism {
     
     @Logged(name = "Arm")
@@ -38,51 +41,74 @@ public class Superstructure implements Mechanism {
         return new Superstructure(arm, intake, elevator);
     }
 
+    public StateMachine createStateMachine(
+        BooleanSupplier stowedTrigger,
+        BooleanSupplier intakingTrigger,
+        BooleanSupplier scoringTrigger
+    ) {
+    StateMachine sm = new StateMachine("Superstructure State Machine");
+    var stowedState = sm.addState(stowedCommand());
+    var intakingState = sm.addState(intakingCommand());
+    var scoringState = sm.addState(scoringCommand());
+
+    stowedState.switchTo(intakingState).when(intakingTrigger);
+    stowedState.switchTo(scoringState).when(scoringTrigger);
+    intakingState.switchTo(stowedState).when(stowedTrigger);
+    intakingState.switchTo(scoringState).when(scoringTrigger);
+    scoringState.switchTo(stowedState).when(stowedTrigger);
+    scoringState.switchTo(intakingState).when(intakingTrigger);
+
+    sm.setInitialState(stowedState);
+
+    return sm;
+    }
+
+
     public void periodic() {
         mArm.periodic();
         mIntake.periodic();
         mElevator.periodic();
     }
 
-    public Command setPoseReady() {
+    public Command stowedCommand(){
         return run(coroutine -> {
             mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
             mArm.setAngleSetpoint(ArmIO.POSE_READY);
             mElevator.setHeightSetpoint(ElevatorIO.POSE_READY);
+            coroutine.yield();
+        }).named("Stow Superstructure");
+    }
+
+    public Command intakingCommand() {
+    return run(coroutine -> {
+        while (true) {
+            mIntake.setAngleSetpoint(IntakeIO.POSE_INTAKE);
+            mArm.setAngleSetpoint(ArmIO.POSE_READY);
+            mElevator.setHeightSetpoint(ElevatorIO.POSE_READY);
+            coroutine.yield();
+        }
+    }).named("INTAKING");
+}  
+
+    public Command scoringCommand() {
+        return run(coroutine -> {
+            while(true){
+                mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
+                mArm.setAngleSetpoint(ArmIO.POSE_SCORE_L4);
+                mElevator.setHeightSetpoint(ElevatorIO.POSE_SCORE_L4);
+                coroutine.yield();
+            }
+        }).named("SCORING");
+    }
+
+
+
+
+    public Command setPoseReady() {
+        return run(coroutine -> {
+            mArm.setAngleSetpoint(ArmIO.POSE_READY);
         }).named("Set Superstructure to Ready Pose");
     }
-
-    public Command setPoseHandoff() {
-        return run(coroutine -> {
-            mIntake.setAngleSetpoint(IntakeIO.POSE_HANDOFF);
-            mArm.setAngleSetpoint(ArmIO.POSE_HANDOFF);
-            mElevator.setHeightSetpoint(ElevatorIO.POSE_HANDOFF);
-        }).named("Set Superstructure to Handoff Pose");
-    }
-    public Command setPoseScoreL2() {
-        return run(coroutine -> {
-            mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
-            mArm.setAngleSetpoint(ArmIO.POSE_SCORE_L2);
-            mElevator.setHeightSetpoint(ElevatorIO.POSE_SCORE_L2);
-        }).named("Set Superstructure to Score L2 Pose");
-    }
-
-    public Command setPoseScoreL3() {
-        return run(coroutine -> {
-            mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
-            mArm.setAngleSetpoint(ArmIO.POSE_SCORE_L3);
-            mElevator.setHeightSetpoint(ElevatorIO.POSE_SCORE_L3);
-        }).named("Set Superstructure to Score L3 Pose");
-    }
-
-    public Command setPoseScoreL4() {
-        return run(coroutine -> {
-            mIntake.setAngleSetpoint(IntakeIO.POSE_STOW);
-            mArm.setAngleSetpoint(ArmIO.POSE_SCORE_L4);
-            mElevator.setHeightSetpoint(ElevatorIO.POSE_SCORE_L4);
-        }).named("Set Superstructure to Score L4 Pose");
-    }
-
 
     public Command setIntakePosition(double angleDegrees) {
         return run(coroutine -> {
@@ -126,36 +152,5 @@ public class Superstructure implements Mechanism {
 
     public Command elevatorScoreL4() {
         return setElevatorPosition(ElevatorIO.POSE_SCORE_L4);
-    }
-    private Command setArmPosition(double angleDegrees) {
-    return run(coroutine -> {
-        mArm.setAngleSetpoint(angleDegrees);
-    }).named("Set Arm Position");
-}
-    public Command armHandoff() {
-        return setArmPosition(ArmIO.POSE_HANDOFF);
-    }
-    public Command armReady() {
-        return setArmPosition(ArmIO.POSE_READY);
-    }
-    public Command armScoreL2() {
-        return setArmPosition(ArmIO.POSE_SCORE_L2);
-    }
-
-    public Command armScoreL3() {
-        return setArmPosition(ArmIO.POSE_SCORE_L3);
-    }
-
-    public Command armScoreL4() {
-        return setArmPosition(ArmIO.POSE_SCORE_L4);
-    }
-    public Command armAfterL2() {
-        return setArmPosition(ArmIO.POSE_AFTER_L2);
-    }
-    public Command armAfterL3() {
-        return setArmPosition(ArmIO.POSE_AFTER_L3);
-    }
-    public Command armAfterL4() {
-        return setArmPosition(ArmIO.POSE_AFTER_L4);
     }
 }
